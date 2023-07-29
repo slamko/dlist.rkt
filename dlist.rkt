@@ -2,18 +2,23 @@
 
 #lang racket
 
+(struct dlist
+  (f))
+
 (define (->dlist lst)
-  (lambda (tail)
-    (append lst tail)))
+  (dlist
+   (lambda (tail)
+     (append lst tail))))
 
 (define (dlist-append dlist1 . dlist2)
-  (lambda (tail)
-    (dlist1
-     (foldr (lambda (dl acc)
-              (dl acc)) tail dlist2))))
+  (dlist
+   (lambda (tail)
+     ((dlist-f dlist1)
+      (foldr (lambda (dl acc)
+              ((dlist-f dl) acc)) tail dlist2)))))
 
-(define (dlist->list dlist)
-    (dlist '()))
+(define (dlist->list dlst)
+    ((dlist-f dlst) '()))
 
 (define (empty)
   (->dlist '()))
@@ -21,18 +26,28 @@
 (define (dlist-length dlist)
   (length (dlist->list dlist)))
 
-(define (dlist-reverse dlist)
-  (lambda (tail)
-    (reverse (dlist tail))))
+(define (dlist-reverse dlst)
+  (dlist
+   (lambda (tail)
+    (reverse ((dlist-f dlst) tail)))))
 
-(define (dlist-car dlist)
-  (car (dlist->list dlist)))
+(define (dlist-car dlst)
+  (car (dlist->list dlst)))
 
-(define (dlist-cdr dlist)
-  (cdr (dlist->list dlist)))
+(define (dlist-cdr dlst)
+  (cdr (dlist->list dlst)))
 
-(define (dlist-ref dlist)
-  (list-ref (dlist->list dlist)))
+(define (dlist-ref dlst)
+  (list-ref (dlist->list dlst)))
+
+(define (dlist-foldl proc init . dlst)
+  (foldl proc init (dlist->list dlst)))
+
+(define (dlist-foldr proc init dlst)
+  (foldr proc init (dlist->list dlst)))
+
+(define (dlist-map proc dlst)
+  (map proc (dlist->list dlst)))
 
 (define main
   (let* (
@@ -41,7 +56,7 @@
          (dl3 (->dlist '(9 8 7 6 5 4 3 2 1)))
          (dl4 (->dlist '(9 8 7 6 5 4 3 2 1)))
          (dl5 (->dlist '(0 0 0 0 0 0 0 0 0)))
-         (dl (dlist-append dl1 dl2 dl3 dl4 dl5))
+         (dl (dlist-reverse (dlist-append dl1 dl2 dl3 dl4 dl5)))
          (l (dlist->list dl))
          )
     
@@ -51,6 +66,7 @@
        (lambda (val)
          (printf "hello: ~a \n" val))
        l)
+      (printf "Dlist?: ~a \n" (dlist? dl))
       )))
 
 main
