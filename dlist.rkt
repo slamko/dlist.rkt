@@ -41,26 +41,29 @@
   (list-ref (dlist->list dlst)))
 
 (define (dlist-foldl proc init . dlsts)
-  (foldl proc init (foldl
-             (lambda (dlst acc)
-               (append (dlist->list dlst) acc)) '() dlsts)))
+  (apply (curry foldl proc init)
+         (map
+          (lambda (dlst)
+            (dlist->list dlst)) dlsts)))
 
 (define (dlist-foldr proc init . dlsts)
-  (foldr proc init (foldl
-             (lambda (dlst acc)
-               (append (dlist->list dlst) acc)) '() dlsts)))
+  (apply (curry foldr proc)
+         init
+         (map
+          (lambda (dlst)
+            (dlist->list dlst)) dlsts)))
 
 (define (dlist-map proc . dlsts)
-  (map proc (foldl
-             (lambda (dlst acc)
-               (append (dlist->list dlst) acc)) '() dlsts)))
+  (apply (curry map proc)
+         (map
+          (lambda (dlst)
+            (dlist->list dlst)) dlsts)))
 
 (define (dlist-for-each proc . dlists)
-  (for-each proc 
-            (foldl
-             (lambda (dlst acc)
-               (dlist->list dlst)) '() dlists)
-            ))
+  (apply (curry for-each proc)
+            (map
+             (lambda (dlst)
+               (dlist->list dlst)) dlists)))
 
 (define main
   (let* (
@@ -69,15 +72,16 @@
          (dl3 (->dlist '(9 8 7 6 5 4 3 2 1)))
          (dl4 (->dlist '(9 8 7 6 5 4 3 2 1)))
          (dl5 (->dlist '(0 0 0 0 0 0 0 0 0)))
-         (dl (dlist-append dl1 dl2 dl3 dl4 dl5))
+         (dl (dlist-append dl1 dl2 ))
+         (dl2 (dlist-append dl3 dl4))
          )
     
     (begin
       ;; (printf "Length: ~a \n" (dlist-length dl))
-      (dlist-for-each
-       (lambda (val)
-         (printf "El: ~a \n" val))
-        dl)
+      (dlist-foldr
+       (lambda (val el acc)
+         (printf "El: ~a : ~a \n" val el))
+        (void) dl dl2)
       ;; (printf "Dlist?: ~a \n" (dlist-car (dlist-cdr (->dlist dl))))
       )))
 
