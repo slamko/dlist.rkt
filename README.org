@@ -1,0 +1,7 @@
+*** Little Racket library that implements Difference List
+It is a lazy immutable data structure that supports O(1) concatenation
+and reverse operations.
+
+Implementation is highly inspired by [[https://github.com/batsh-dev-team/Dlist][this Ocaml library]].
+
+As a usage example see [[https://github.com/slamko/dlist.rkt/blob/master/example.rkt][example.rkt]].
