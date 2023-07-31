@@ -1,6 +1,20 @@
-#!/usr/bin/env racket
-
 #lang racket
+
+(provide
+ ->dlist
+ dlist-append
+ dlist->list
+ dlist-length
+ dlist-foldl
+ dlist-foldr
+ dlist-map
+ dlist-for-each
+ dlist-reverse
+ dlist-ref
+ dlist-empty
+ dlist-car
+ dlist-cdr
+ )
 
 (struct dlist
   (f))
@@ -20,7 +34,7 @@
 (define (dlist->list dlst)
     ((dlist-f dlst) '()))
 
-(define (empty)
+(define (dlist-empty)
   (->dlist '()))
 
 (define (dlist-length dlist)
@@ -64,25 +78,3 @@
             (map
              (lambda (dlst)
                (dlist->list dlst)) dlists)))
-
-(define main
-  (let* (
-         (dl1 (->dlist '(1 2 3 4 5 6 7 8 9)))
-         (dl2 (->dlist '(4 5 6 7 8 9 0 1 2)))
-         (dl3 (->dlist '(9 8 7 6 5 4 3 2 1)))
-         (dl4 (->dlist '(9 8 7 6 5 4 3 2 1)))
-         (dl5 (->dlist '(0 0 0 0 0 0 0 0 0)))
-         (dl (dlist-append dl1 dl2 ))
-         (dl2 (dlist-append dl3 dl4))
-         )
-    
-    (begin
-      ;; (printf "Length: ~a \n" (dlist-length dl))
-      (dlist-foldr
-       (lambda (val el acc)
-         (printf "El: ~a : ~a \n" val el))
-        (void) dl dl2)
-      ;; (printf "Dlist?: ~a \n" (dlist-car (dlist-cdr (->dlist dl))))
-      )))
-
-main
